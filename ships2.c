@@ -133,7 +133,7 @@ static void freeCoor (coord x, coord y, struct field* f) {
 
 
 /*this function destroys the field and cleans up all the memory it was using*/
-void fieldDestroy(struct field *f) {
+/*void fieldDestroy(struct field *f) {
 	struct coorElem* e;
 	struct coorElem* next;
 	for (int i=0; i<f->coorSize; i++) {
@@ -141,14 +141,27 @@ void fieldDestroy(struct field *f) {
 		while (e!=0){
 			next = e->next;
 			/*free(&(e->coor)); /*free position struct within coorElem? - DO WE NEED TO DO THIS?*/
-			free(e->shipAddress); /*free ship struct mem that was malloced*/
-			free(e); /*free coorElem mem*/
-			e = next;
+			/*free(e->shipAddress); /*free ship struct mem that was malloced*/
+			/*free(e); /*free coorElem mem*/
+			/*e = next;
 		}
 	}
 	free(f->coorTable); /*free coorTable*/
-	free(f); /*free mem used for field struct*/
+	/*free(f); /*free mem used for field struct*/
 
+/*}*/
+
+void fieldDestroy(struct field *f) {
+	struct coorElem* e;
+
+	for (int i = 0; i<(f->coorSize; i++); i++) {
+		e = f->coorTable[i];
+		while (e!=0) {
+			fieldAttack(f, e->coor);
+		}
+	}
+	free(f->coorTable);
+	free(f);
 }
 
 /*this function creates a coorElem struct for the hash table of coordinates used in the field*/
@@ -205,7 +218,7 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 		if ((s.direction == VERTICAL) && ((s.topLeft.x < COORD_MAX) && ((s.topLeft.y + s.length - 1) < COORD_MAX))) { /*if dealing with vertical ship*/
 			for (coord i = s.topLeft.y; i <=(s.topLeft.y + s.length - 1); i++) { /*HOW DO I KNOW THIS WILL WORK WITH ALL POTENTIAL TYPES FOR COOR???*/
 				newElem = pointLookup(s.topLeft.x, i, f);
-				printf("Address preexisting ship:%d", newElem);
+				/*printf("Address preexisting ship:%d", newElem);*/
 				if (newElem != 0) { /*There's already a ship here --> need to destroy it*/
 					fieldAttack(f, newElem->coor); /*destroys ship*/
 				}
@@ -224,7 +237,7 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 			for (coord i = s.topLeft.x; i<=(s.topLeft.x + s.length - 1); i++) {
 				/*struct coorElem* newElem; - IS IT OKAY TO HAVE THIS DEFINED AT TOP AND NOT IN EACH FOR LOOP?*/
 				newElem = pointLookup(i, s.topLeft.y, f);
-				printf("Address preexisting ship:%d", newElem);
+				/*printf("Address preexisting ship:%d", newElem);*/
 				if (newElem !=0) {
 					fieldAttack(f, newElem->coor);
 				}
