@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include "ships.h"
+#include "coordinates.h"
 
 #define LOAD_FACTOR (1)
 #define MULTIPLIER (37)
-#define INITIAL_SIZE(50)
+#define INITIAL_SIZE (50)
+
+
 /*Veena Advani
 CPSC 223
 HW6
@@ -26,19 +29,14 @@ struct field {
 	size_t coorCount; /*num coordinates occupied in the field by ships*/
 	unsigned int coorSize; /*size of coordinate table*/
 	struct coorElem **coorTable;
-}
- 
+};
+
 /*element for the coordinate hash table, contains a position struct and a pointer to the next position struct*/
 struct coorElem {
 	struct ship* shipAddress;
 	struct position coor;
 	struct position *next; /*SHOULD THIS BE A DEQUE???*/
-}
-
-/*this function creates a field*/
-struct field *fieldCreate(void) {
-	return fieldCreateInternal(INITIAL_SIZE);
-}
+};
 
 static field *fieldCreateInternal(unsigned int size) { /*IS AN INT LARGE ENOUGH FOR THIS???*/
 	struct field* field;
@@ -54,8 +52,13 @@ static field *fieldCreateInternal(unsigned int size) { /*IS AN INT LARGE ENOUGH 
 	assert(field->coorTable);
 
 	for (int j = 0; j < field->coorSize; j++) {
-		field->coorTable[i] = 0;
+		field->coorTable[j] = 0;
 	}
+}
+
+/*this function creates a field*/
+struct field *fieldCreate(void) {
+	return fieldCreateInternal(INITIAL_SIZE);
 }
 
 static unsigned long hashCoor(coord x, coord y) {
@@ -126,31 +129,7 @@ static void freeCoor (coord x, coord y, field* f) {
 	}
 }
 
-/*MESSAGE - NEED TO REHASH EVERYTHING WHEN YOU GROW THE HASH TABLE, this function grows the coordinate table if the number of coordinates occupied becomes too large for it*/
-static void growCoors(struct field *f) {
-	struct field *f2;
-	struct field swap;
-	int i;
-	struct coorElem *e;
-	
-	f2 = fieldCreateInternal(f->coorSize*2);
 
-	for (i=0; i < f->coorSize; i++) {
-		for (e=f->coorTable[i]; e!=0; e = e->next) {
-			fieldPlaceShip(f2, *(e->shipAddress));
-		}
-	}
-
-	/*NEED TO UNDERSTAND HOW THIS SWAP WORKS BETTER, NEVER MALLOCED ANYTHING FOR SWAP, HOW DOES IT WORK???*/
-	swap = *f;
-	*f = *f2;
-	*f2 = swap;
-
-	fieldDestroy(f2);
-
-	f->coorSize *=2; /*increases size of coorTable to represent increase we just made*/
-	
-}
 
 /*this function destroys the field and cleans up all the memory it was using*/
 void fieldDestroy(struct field *f) {
@@ -180,6 +159,32 @@ static struct coorElem* coorElemCreate (coord x, coord y, struct ship* shipAddre
 	newElem->shipAddress = shipAddress;
 	newElem->next = 0;
 	return newElem;
+}
+
+/*MESSAGE - NEED TO REHASH EVERYTHING WHEN YOU GROW THE HASH TABLE, this function grows the coordinate table if the number of coordinates occupied becomes too large for it*/
+static void growCoors(struct field *f) {
+	struct field *f2;
+	struct field swap;
+	int i;
+	struct coorElem *e;
+	
+	f2 = fieldCreateInternal(f->coorSize*2);
+
+	for (i=0; i < f->coorSize; i++) {
+		for (e=f->coorTable[i]; e!=0; e = e->next) {
+			fieldPlaceShip(f2, *(e->shipAddress));
+		}
+	}
+
+	/*NEED TO UNDERSTAND HOW THIS SWAP WORKS BETTER, NEVER MALLOCED ANYTHING FOR SWAP, HOW DOES IT WORK???*/
+	swap = *f;
+	*f = *f2;
+	*f2 = swap;
+
+	fieldDestroy(f2);
+
+	f->coorSize *=2; /*increases size of coorTable to represent increase we just made*/
+	
 }
 
 /*this function takes a pointer to a field and a struct ship and puts the ship in the field if the ship fits the necessary qualifications*/
@@ -266,3 +271,4 @@ char fieldAttack(struct field *f, struct position p) {
 size_t fieldCountShips(const struct field *f) {
 	return f->shipCount;
 }
+
