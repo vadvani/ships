@@ -203,8 +203,9 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 		/*before place ship, need to make sure there's not already a ship there - STILL NEED TO WRITE THIS CODE*/
 
 		if ((s.direction == VERTICAL) && ((s.topLeft.x < COORD_MAX) && ((s.topLeft.y + s.length - 1) < COORD_MAX))) { /*if dealing with vertical ship*/
-			for (coord i = s.topLeft.y; i < (s.topLeft.y + s.length - 1); i++) { /*HOW DO I KNOW THIS WILL WORK WITH ALL POTENTIAL TYPES FOR COOR???*/
+			for (coord i = s.topLeft.y; i <=(s.topLeft.y + s.length - 1); i++) { /*HOW DO I KNOW THIS WILL WORK WITH ALL POTENTIAL TYPES FOR COOR???*/
 				newElem = pointLookup(s.topLeft.x, i, f);
+				printf("Address preexisting ship:%d", newElem);
 				if (newElem != 0) { /*There's already a ship here --> need to destroy it*/
 					fieldAttack(f, newElem->coor); /*destroys ship*/
 				}
@@ -220,9 +221,10 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 			(f->shipCount)++;
 			/*Now if ship is horizontal, do similar procedure*/
 		} else if ((s.direction == HORIZONTAL) && (((s.topLeft.x + s.length - 1) < COORD_MAX) && (s.topLeft.y < COORD_MAX))) {
-			for (coord i = s.topLeft.x; i<(s.topLeft.x + s.length - 1); i++) {
+			for (coord i = s.topLeft.x; i<=(s.topLeft.x + s.length - 1); i++) {
 				/*struct coorElem* newElem; - IS IT OKAY TO HAVE THIS DEFINED AT TOP AND NOT IN EACH FOR LOOP?*/
 				newElem = pointLookup(i, s.topLeft.y, f);
+				printf("Address preexisting ship:%d", newElem);
 				if (newElem !=0) {
 					fieldAttack(f, newElem->coor);
 				}
