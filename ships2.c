@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
 #include "ships.h"
-#include "coordinates.h"
 
 #define LOAD_FACTOR (1)
 #define MULTIPLIER (37)
@@ -26,7 +26,7 @@ if ship name is NO_SHIP_NAME or length > MAX_SHIP_LENGTH or any coordinate is > 
 
 struct field {
 	size_t shipCount; /*num ships in the field*/
-	size_t coorCount; /*num coordinates occupied in the field by ships*/
+	unsigned int coorCount; /*num coordinates occupied in the field by ships*/
 	unsigned int coorSize; /*size of coordinate table*/
 	struct coorElem **coorTable;
 };
@@ -35,10 +35,10 @@ struct field {
 struct coorElem {
 	struct ship* shipAddress;
 	struct position coor;
-	struct position *next; /*SHOULD THIS BE A DEQUE???*/
+	struct coorElem *next; /*SHOULD THIS BE A DEQUE???*/
 };
 
-static field *fieldCreateInternal(unsigned int size) { /*IS AN INT LARGE ENOUGH FOR THIS???*/
+static struct field *fieldCreateInternal(unsigned int size) { /*IS AN INT LARGE ENOUGH FOR THIS???*/
 	struct field* field;
 	
 	field = malloc(sizeof(struct field));
@@ -54,6 +54,7 @@ static field *fieldCreateInternal(unsigned int size) { /*IS AN INT LARGE ENOUGH 
 	for (int j = 0; j < field->coorSize; j++) {
 		field->coorTable[j] = 0;
 	}
+	return field;
 }
 
 /*this function creates a field*/
@@ -73,19 +74,18 @@ static unsigned long hashCoor(coord x, coord y) {
 
 /*this function takes in two coordinates and a field, and returns a pointer to the coorElem
 that contains those two points, if it exists in the field, otherwise returns null pointer*/
-static struct coorElem* pointLookup (coord x, coord y, field* f) {
+static struct coorElem* pointLookup (coord x, coord y, struct field* f) {
 	struct coorElem* e;
 	unsigned long h;
 	h = hashCoor(x, y) % f->coorSize; /*hash point value to find what row it should be in hash table*/
 
 	for (e=f->coorTable[h]; e!=0; e=e->next) { /*now step through linked list to see if the point is there*/
 		if ((e->coor.x == x) && (e->coor.y == y)) { /*THIS FUNCTION DOESN'T CHECK THAT THE SHIP ADDRESS ISN'T 0!!!*/
-			return e; /*return address of coorElem with that point*/
+			break; /*found struct we're looking for break - will it increment e after break? - hopefully not...*/
 		}
 	}
-	else {
-		return 0;
-	}
+	return e; /*if found a struct, e will be a pointer to something, if not, e will be 0.*/
+	
 }
 
 /*this function doesn't actually destroy the coordinate, just sets the shipaddress to 0
@@ -96,10 +96,11 @@ static void destroyCoor (struct coorElem* coor) {
 
 /*This function takes two coordinate values and a pointer to a field, and removes the coorElem struct for that coordinate pair from
 the hash table and frees all memory it was using*/
-static void freeCoor (coord x, coord y, field* f) {
+static void freeCoor (coord x, coord y, struct field* f) {
 	struct coorElem* e;
 	struct coorElem* prev;
 	struct coorElem* oldElem;
+	struct coorElem* next;
 	unsigned long h;
 	h= hashCoor(x, y) % f->coorSize;
 
@@ -118,7 +119,7 @@ static void freeCoor (coord x, coord y, field* f) {
 			next = e->next;
 			if ((e->coor.x == x) && (e->coor.y == y)) {
 				free (oldElem); /*FREEING FULL ELEM - WILL THIS FREE POSITION STRUCT WITHIN IT???*/
-				(f->coorSize)--; /*decrement coordinate counter in the field*/
+				(f->coorCount)--; /*decrement coordinate counter in the field*/
 				prev->next = next; /*set next pointer of prev elem to next elem*/
 				break; /*got rid of elem we were looking for, break out of while*/
 			}
@@ -142,6 +143,7 @@ void fieldDestroy(struct field *f) {
 			/*free(&(e->coor)); /*free position struct within coorElem? - DO WE NEED TO DO THIS?*/
 			free(e->shipAddress); /*free ship struct mem that was malloced*/
 			free(e); /*free coorElem mem*/
+			e = next;
 		}
 	}
 	free(f->coorTable); /*free coorTable*/
@@ -190,6 +192,8 @@ static void growCoors(struct field *f) {
 /*this function takes a pointer to a field and a struct ship and puts the ship in the field if the ship fits the necessary qualifications*/
 void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS RID OF OLD SHIP IF THERE'S ALREADY A SHIP IN THAT LOCATION!!!*/
 	struct ship* ship;
+	struct coorElem* newElem;
+	unsigned long h;
 	ship = malloc(sizeof(struct ship)); /*mallocing memory to store ship struct*/
 	assert(ship);
 	*ship = s; /*IS THIS HOW YOU COPY ALL THE CONTENTS OF THE STRUCT OVER???*/
@@ -200,33 +204,36 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 
 		if ((s.direction == VERTICAL) && ((s.topLeft.x < COORD_MAX) && ((s.topLeft.y + s.length - 1) < COORD_MAX))) { /*if dealing with vertical ship*/
 			for (coord i = s.topLeft.y; i < (s.topLeft.y + s.length - 1); i++) { /*HOW DO I KNOW THIS WILL WORK WITH ALL POTENTIAL TYPES FOR COOR???*/
-				struct coorElem* newElem;
-				unsigned long h;
-				h = hashCoor(x, i) % f->coorSize;
+				newElem = pointLookup(s.topLeft.x, i, f);
+				if (newElem != 0) { /*There's already a ship here --> need to destroy it*/
+					fieldAttack(f, newElem->coor); /*destroys ship*/
+				}
+				if (f->coorCount >= (f->coorSize * LOAD_FACTOR)) { /*If we have too many coordinates --> grow hash table*/
+					growCoors(f); 
+				}	
+				h = hashCoor(s.topLeft.x, i) % f->coorSize;
 				newElem = coorElemCreate(s.topLeft.x, i, ship);
 				newElem->next = f->coorTable[h]; /*IS THIS OKAY???, the way I'm pushing things onto the stack?*/
 				f->coorTable[h]= newElem;
 				(f->coorCount)++;
-
-				if (f->coorCount >= (f->coorSize * LOAD_FACTOR)) {
-					growCoors(f); /*STILL NEEDS TO BE IMPLEMENTED*/
-				}	
-			}
+				}
 			(f->shipCount)++;
-
+			/*Now if ship is horizontal, do similar procedure*/
 		} else if ((s.direction == HORIZONTAL) && (((s.topLeft.x + s.length - 1) < COORD_MAX) && (s.topLeft.y < COORD_MAX))) {
 			for (coord i = s.topLeft.x; i<(s.topLeft.x + s.length - 1); i++) {
-				struct coorElem* newElem;
-				unsigned long h;
-				h = hashCoor(i, y) % f->coorSize;
+				/*struct coorElem* newElem; - IS IT OKAY TO HAVE THIS DEFINED AT TOP AND NOT IN EACH FOR LOOP?*/
+				newElem = pointLookup(i, s.topLeft.y, f);
+				if (newElem !=0) {
+					fieldAttack(f, newElem->coor);
+				}
+				if (f->coorCount >= (f->coorSize * LOAD_FACTOR)) {
+					growCoors(f); 
+				}	
+				h = hashCoor(i, s.topLeft.y) % f->coorSize;
 				newElem = coorElemCreate(i, s.topLeft.y, ship);
 				newElem->next = f->coorTable[h];
 				f->coorTable[h]= newElem;
 				(f->coorCount)++;
-
-				if (f->coorCount >= (f->coorSize * LOAD_FACTOR)) {
-					growCoors(f); /*STILL NEEDS TO BE IMPLEMENTED*/
-				}	
 			}
 			(f->shipCount)++;	
 		}
