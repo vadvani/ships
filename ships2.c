@@ -153,7 +153,7 @@ static void freeCoor (coord x, coord y, struct field* f) {
 /*}*/
 
 void fieldDestroy(struct field *f) {
-	struct coorElem* e;
+	/*struct coorElem* e;
 	struct coorElem* next;
 	for (int i = 0; i<(f->coorSize); i++) {
 		e = f->coorTable[i];
@@ -163,7 +163,7 @@ void fieldDestroy(struct field *f) {
 		}
 	}
 	free(f->coorTable);
-	free(f);
+	free(f);*/
 }
 
 /*this function creates a coorElem struct for the hash table of coordinates used in the field*/
