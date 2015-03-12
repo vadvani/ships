@@ -107,8 +107,9 @@ static void freeCoor (coord x, coord y, struct field* f) {
 	e=f->coorTable[h]; /*ever going to have problem where value is at coorTable[h]???*/
 	/*if coorElem we want is first in list*/
 	if ((e->coor.x == x) && (e->coor.y == y)) {
-		f->coorTable[h] = e;
+		f->coorTable[h] = e->next;
 		free(e);
+		(f->coorCount)--;
 	}
 	else {
 		prev = f->coorTable[h];
@@ -153,11 +154,12 @@ static void freeCoor (coord x, coord y, struct field* f) {
 
 void fieldDestroy(struct field *f) {
 	struct coorElem* e;
-
-	for (int i = 0; i<(f->coorSize; i++); i++) {
+	struct coorElem* next;
+	for (int i = 0; i<(f->coorSize); i++) {
 		e = f->coorTable[i];
 		while (e!=0) {
 			fieldAttack(f, e->coor);
+			e = f->coorTable[i];
 		}
 	}
 	free(f->coorTable);
@@ -265,7 +267,7 @@ char fieldAttack(struct field *f, struct position p) {
 	struct ship* s;
 	char retVal;
 	e = pointLookup(p.x, p.y, f); /*see if that location there exists a ship*/
-	if ((e==0) || (e->shipAddress == 0)) { /*WOULDN'T NEED THIS SHIP ADDRESS PART IF I USED A DEQUE*/
+	if (e==0) { /*WOULDN'T NEED THIS SHIP ADDRESS PART IF I USED A DEQUE*/
 		return NO_SHIP_NAME;
 	}
 	else { /*there is a ship in that location*/
@@ -275,7 +277,7 @@ char fieldAttack(struct field *f, struct position p) {
 			for (int i=(s->topLeft.y); i<(s->topLeft.y + s->length - 1); i++) {
 				/*oldElem = pointLookup(p.x, i, f);
 				/*we know there is a ship occupying these points --> don't need to check that oldElem or oldElem->shipAddress == 0*/
-				freeCoor(p.x, i, f); /*sets ship Address at the coorElem for that point to 0*/
+				freeCoor(p.x, i, f);
 			}
 		}
 		else if (s->direction == HORIZONTAL) {
