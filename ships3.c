@@ -117,7 +117,7 @@ static void freeShip (struct ship* s, struct field* f) {
 	}
 	else {
 		prev = f->shipTable[h];
-		e = f->shipTable[h]->next;
+		e = f->shipTable[h]->next; /*TO FIX??? - make sure when you're calling this, f->shipTable[h] IS NOT A NULL POINTER*/
 
 		while (e!=0) { /*DOES THIS NEED TO RETURN AN ERROR IF IT DOESN'T FIND ANYTHING TO FREE?*/
 			next = e->next;
@@ -354,8 +354,11 @@ static char findAndDestroy (struct field* f, struct position p, coord i, coord j
 	h = h % f->shipSize;
 
 	e=f->shipTable[h];
+	if (e == 0) { /*no ship at this coordinate --> return '.' */
+		return retVal;
+	}
 	/*if shipElem we want is first in list*/
-	if ((e != 0) && (e->shipAddress->topLeft.x == i) && (e->shipAddress->topLeft.y == j)) { /*if ship located at correct point*/
+	if ((e->shipAddress->topLeft.x == i) && (e->shipAddress->topLeft.y == j)) { /*if ship located at correct point*/
 		if ((pointOccupied(e->shipAddress, p.x, p.y)) == 1) { /*ship occupies attack position point --> need to free it*/
 			f->shipTable[h] = e->next;
 			retVal = e->shipAddress->name;
