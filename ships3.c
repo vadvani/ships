@@ -183,6 +183,8 @@ static int collisionCheck (struct ship* s1, struct ship* s2) {
 static void makeClear (struct field* f, struct ship* s) {
 	coord i;
 	coord j;
+	coord initialj;
+	coord initiali;
 	struct ship* e;
 	if (s->direction == VERTICAL) {
 		/*checking for vertical ship collisions from above first*/
@@ -208,17 +210,18 @@ static void makeClear (struct field* f, struct ship* s) {
 		/*checking for horizontal ship collisions from side*/
 
 		if (s->topLeft.x >= (MAX_SHIP_LENGTH - 1)) {
-			i = s->topLeft.x - MAX_SHIP_LENGTH + 1;
+			initiali = s->topLeft.x - MAX_SHIP_LENGTH + 1;
 		} else {
-			i = 0;
+			initiali = 0;
 		}
 
 		for (j = s->topLeft.y; j<= (s->topLeft.y + s->length - 1); j++) {
+			i = initiali;
 			while (i<= s->topLeft.x) {
 				e = shipLookUp(f, i, j);
-				printf("%d", e);
+				printf("%d\n", e);
 				if ((e != 0) && (e->direction == HORIZONTAL)) {
-					printf("%c", e->name);
+					printf("%c\n", e->name);
 					if ((collisionCheck(s, e)) == 1) {
 						freeShip(e, f);
 						printf("freed ship");					}
@@ -232,12 +235,13 @@ static void makeClear (struct field* f, struct ship* s) {
 	if (s->direction == HORIZONTAL) {
 		/*checking for vertical ships that could collide from above*/
 		if (s->topLeft.y >= (MAX_SHIP_LENGTH - 1)) {
-			j = s->topLeft.y - MAX_SHIP_LENGTH + 1;
+			initialj = s->topLeft.y - MAX_SHIP_LENGTH + 1;
 		} else {
-			j = 0;
+			initialj = 0;
 		}
 
 		for (i = s->topLeft.x; i <= (s->topLeft.x + s->length - 1); i++) {
+			j = initialj;
 			while (j<= s->topLeft.y) {
 				e = shipLookUp(f, i, j); /*see if ship exists with top left coord at this point*/
 				if ((e != 0) && (e->direction == VERTICAL)) {
