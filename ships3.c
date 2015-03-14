@@ -331,7 +331,7 @@ static int pointOccupied (struct ship* s, coord x, coord y) {
 	}
 
 	if (s->direction == HORIZONTAL) {
-		if ((s->topLeft.y == y) && (s.topLeft.x <= x) && ((s.topLeft.x + s->length - 1) >= x)) {
+		if ((s->topLeft.y == y) && (s->topLeft.x <= x) && ((s->topLeft.x + s->length - 1) >= x)) {
 			return 1;
 		} 
 		else {
@@ -340,7 +340,7 @@ static int pointOccupied (struct ship* s, coord x, coord y) {
 	}
 }
 
-static char findAndDestroy (struct field* f, coord i, coord j) {
+static char findAndDestroy (struct field* f, struct position p, coord i, coord j) {
 	char retVal;
 	struct shipElem* e;
 	struct shipElem* prev;
@@ -414,7 +414,7 @@ char fieldAttack(struct field *f, struct position p) {
 
 	while ((j<= p.y) && (retVal == NO_SHIP_NAME)) {
 		/*see if ship exists with topleft at that point, then collision check, then free ship if needed and set return value to shipName*/
-		retVal = findAndDestroy(f, i, j);
+		retVal = findAndDestroy(f, p, i, j);
 
 		j++;
 	}
@@ -423,7 +423,7 @@ char fieldAttack(struct field *f, struct position p) {
 		/*horizontal check from point*/
 		if (p.x >= (MAX_SHIP_LENGTH - 1)) {
 			i = p.x - MAX_SHIP_LENGTH + 1;
-			j = p.y
+			j = p.y;
 		} else {
 			i = 0;
 			j = p.y;
@@ -431,7 +431,7 @@ char fieldAttack(struct field *f, struct position p) {
 
 		while ((i <= p.x) && (retVal == NO_SHIP_NAME)) {
 		/*see if ship exists with topleft at that point, then collision check, then free ship if needed*/
-		retVal = findAndDestroy(f, i, j);
+		retVal = findAndDestroy(f, p, i, j);
 		
 		i++;
 		}
