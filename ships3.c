@@ -320,11 +320,123 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 	
 }
 
+static int pointOccupied (struct ship* s, coord x, coord y) {
+	if (s->direction == VERTICAL) {
+		if ((s->topLeft.x == x) && (s->topLeft.y <= y) && ((s->topLeft.y + s->length - 1) >= y)) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	if (s->direction == HORIZONTAL) {
+		if ((s->topLeft.y == y) && (s.topLeft.x <= x) && ((s.topLeft.x + s->length - 1) >= x)) {
+			return 1;
+		} 
+		else {
+			return 0;
+		}
+	}
+}
+
+static char findAndDestroy (struct field* f, coord i, coord j) {
+	char retVal;
+	struct shipElem* e;
+	struct shipElem* prev;
+	struct shipElem* next;
+	unsigned long h;
+	retVal = NO_SHIP_NAME;
+
+	h = 0;
+	h = h*MULTIPLIER + i;
+	h = h*MULTIPLIER + j;
+	h = h % f->shipSize;
+
+	e=f->shipTable[h];
+	/*if shipElem we want is first in list*/
+	if ((e != 0) && (e->shipAddress->topLeft.x == i) && (e->shipAddress->topLeft.y == j)) { /*if ship located at correct point*/
+		if ((pointOccupied(e->shipAddress, p.x, p.y)) == 1) { /*ship occupies attack position point --> need to free it*/
+			f->shipTable[h] = e->next;
+			retVal = e->shipAddress->name;
+			free(e->shipAddress);
+			free(e);
+			(f->shipCount)--;
+			return retVal;
+		}
+	}
+	else {
+		prev = f->shipTable[h];
+		e = f->shipTable[h]->next;
+
+		while (e!=0) { /*DOES THIS NEED TO RETURN AN ERROR IF IT DOESN'T FIND ANYTHING TO FREE?*/
+			next = e->next;
+			if ((e->shipAddress->topLeft.x == i) && (e->shipAddress->topLeft.y == j)) { /*if ship located at correct point*/
+				if ((pointOccupied(e->shipAddress, p.x, p.y)) == 1) { /*ship occupies attack position point --> need to free it*/
+					retVal = e->shipAddress->name;
+					free(e->shipAddress);
+					free (e); /*FREEING FULL ELEM - WILL THIS FREE POSITION STRUCT WITHIN IT???*/
+					(f->shipCount)--; /*decrement coordinate counter in the field*/
+					prev->next = next; /*set next pointer of prev elem to next elem*/
+					return retVal; /*got rid of elem we were looking for, break out of while*/
+				}
+			}
+		/*if we know this isn't the block we need to get rid of, then update previous and e pointers for next loop*/
+			prev = e;
+			e = next;
+		}
+	}
+
+	return retVal;
+
+}
+
 /*this function takes in a pointer to a field and a position struct, and if a ship exists in that location, destroys the ship
 and returns the name of the ship*/
 char fieldAttack(struct field *f, struct position p) {
-	struct ship* e;
-	/*NEED TO CHECK ALL POSSIBLE POINTS MAXSHIPLENGTH AWAY FROM POSITION COORDINATE - see notes*/
+	coord i;
+	coord j;
+	char retVal;
+	struct shipElem* e;
+	struct shipElem* prev;
+	struct shipElem* next;
+	unsigned long h;
+	retVal = NO_SHIP_NAME;
+	/*vertical check from point first*/
+	if (p.y >= (MAX_SHIP_LENGTH - 1)) {
+		j = p.y - MAX_SHIP_LENGTH + 1;
+		i = p.x;
+	}
+	else {
+		j = 0;
+		i = p.x;
+	}
+
+	while ((j<= p.y) && (retVal == NO_SHIP_NAME)) {
+		/*see if ship exists with topleft at that point, then collision check, then free ship if needed and set return value to shipName*/
+		retVal = findAndDestroy(f, i, j);
+
+		j++;
+	}
+
+	if (retVal == NO_SHIP_NAME) { /*if retVal still equals NO_SHIP_NAME --> need to check horizontal*/
+		/*horizontal check from point*/
+		if (p.x >= (MAX_SHIP_LENGTH - 1)) {
+			i = p.x - MAX_SHIP_LENGTH + 1;
+			j = p.y
+		} else {
+			i = 0;
+			j = p.y;
+		}
+
+		while ((i <= p.x) && (retVal == NO_SHIP_NAME)) {
+		/*see if ship exists with topleft at that point, then collision check, then free ship if needed*/
+		retVal = findAndDestroy(f, i, j);
+		
+		i++;
+		}
+	}  
+	return retVal;	
 }
 
 size_t fieldCountShips(const struct field *f) {
