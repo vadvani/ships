@@ -201,7 +201,7 @@ static void makeClear (struct field* f, struct ship* s) {
 			if ((e != 0) && (e->direction == VERTICAL)) {
 				if ((collisionCheck(s, e)) == 1) {
 					freeShip(e, f);
-					printf("freed ship");
+					/*printf("freed ship");*/
 				}
 			}
 			j++;
@@ -219,12 +219,13 @@ static void makeClear (struct field* f, struct ship* s) {
 			i = initiali;
 			while (i<= s->topLeft.x) {
 				e = shipLookUp(f, i, j);
-				printf("%d\n", e);
+				/*printf("%d\n", e);*/
 				if ((e != 0) && (e->direction == HORIZONTAL)) {
-					printf("%c\n", e->name);
+					/*printf("%c\n", e->name);*/
 					if ((collisionCheck(s, e)) == 1) {
 						freeShip(e, f);
-						printf("freed ship");					}
+						/*printf("freed ship");*/
+					}
 				}
 				i++;
 			}
@@ -247,7 +248,7 @@ static void makeClear (struct field* f, struct ship* s) {
 				if ((e != 0) && (e->direction == VERTICAL)) {
 					if ((collisionCheck(s, e)) == 1) { /*see if ship collides with ship we want to place*/
 						freeShip(e, f); /*if ship does collide -> remove it*/
-						printf("freed ship");
+						/*printf("freed ship");*/
 					}
 				}
 				j++;
@@ -268,7 +269,7 @@ static void makeClear (struct field* f, struct ship* s) {
 			if ((e != 0) && (e->direction == HORIZONTAL)) {
 				if ((collisionCheck(s, e)) == 1) {
 					freeShip(e, f);
-					printf("freed ship");
+					/*printf("freed ship");*/
 				}
 			}
 			i++;
