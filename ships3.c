@@ -324,10 +324,14 @@ size_t fieldCountShips(const struct field *f) {
 
 void fieldDestroy(struct field *f){
 	struct shipElem* e;
+	struct shipElem* next;
 	for (int i=0; i<(f->shipSize); i++) {
-		for (e = f->shipTable[i]; e != 0; e=e->next) {
+		e = f->shipTable[i];
+		while (e != 0) {
+			next = e->next;
 			free(e->shipAddress);
 			free(e);
+			e = next;
 		}
 	}
 	free(f->shipTable);
