@@ -40,7 +40,7 @@ static struct field *fieldCreateInternal(unsigned int size) { /*IS AN INT LARGE 
 	assert(field->shipTable);
 
 	for (int j = 0; j < field->shipSize; j++) {
-		field->coorTable[j] = 0;
+		field->shipTable[j] = 0;
 	}
 	return field;
 }
@@ -86,7 +86,7 @@ static struct ship* shipLookUp (struct field *f, coord x, coord y) {
 	h = h % f->shipSize;
 
 	for (e=f->shipTable[h]; e!=0; e=e->next) {
-		if ((e->shipAddress->topLeft.x == x) && (e->shipAddress->topLeft.y == y) {
+		if ((e->shipAddress->topLeft.x) == x) && ((e->shipAddress->topLeft.y) == y) {
 			break;
 		}
 	}
@@ -111,13 +111,13 @@ static void freeShip (struct ship* s, struct field* f) {
 		(f->shipCount)--;
 	}
 	else {
-		prev = f->coorTable[h];
-		e = f->coorTable[h]->next;
+		prev = f->shipTable[h];
+		e = f->shipTable[h]->next;
 
 		while (e!=0) { /*DOES THIS NEED TO RETURN AN ERROR IF IT DOESN'T FIND ANYTHING TO FREE?*/
 			next = e->next;
 			if (e->shipAddress == s) {
-				free(e->shipAddress)
+				free(e->shipAddress);
 				free (e); /*FREEING FULL ELEM - WILL THIS FREE POSITION STRUCT WITHIN IT???*/
 				(f->shipCount)--; /*decrement coordinate counter in the field*/
 				prev->next = next; /*set next pointer of prev elem to next elem*/
@@ -285,8 +285,8 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 				}	
 				h = hashShip(ship) % f->shipSize;
 				newElem = shipElemCreate(ship);
-				newElem->next = f->coorTable[h]; /*IS THIS OKAY???, the way I'm pushing things onto the stack?*/
-				f->coorTable[h]= newElem;
+				newElem->next = f->shipTable[h]; /*IS THIS OKAY???, the way I'm pushing things onto the stack?*/
+				f->shipTable[h]= newElem;
 				(f->shipCount)++;
 		/*Now if ship is horizontal, do similar procedure*/
 		} else if ((s.direction == HORIZONTAL) && (((s.topLeft.x + s.length - 1) < COORD_MAX) && (s.topLeft.y < COORD_MAX))) {
@@ -297,8 +297,8 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 				}	
 				h = hashShip(ship) % f->shipSize;
 				newElem = shipElemCreate(ship);
-				newElem->next = f->coorTable[h];
-				f->coorTable[h]= newElem;
+				newElem->next = f->shipTable[h];
+				f->shipTable[h]= newElem;
 				(f->shipCount)++;	
 		}
 		
