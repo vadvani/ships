@@ -216,7 +216,9 @@ static void makeClear (struct field* f, struct ship* s) {
 		for (j = s->topLeft.y; j<= (s->topLeft.y + s->length - 1); j++) {
 			while (i<= s->topLeft.x) {
 				e = shipLookUp(f, i, j);
+				printf("%d", e);
 				if ((e != 0) && (e->direction == HORIZONTAL)) {
+					printf("%c", e->name);
 					if ((collisionCheck(s, e)) == 1) {
 						freeShip(e, f);
 						printf("freed ship");					}
