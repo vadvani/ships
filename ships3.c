@@ -218,7 +218,7 @@ static void makeClear (struct field* f, struct ship* s) {
 				e = shipLookUp(f, i, j);
 				if ((e != 0) && (e->direction == HORIZONTAL)) {
 					if ((collisionCheck(s, e)) == 1) {
-						freeShip(e, f
+						freeShip(e, f);
 						printf("freed ship");					}
 				}
 				i++;
