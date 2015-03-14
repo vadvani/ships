@@ -90,7 +90,12 @@ static struct ship* shipLookUp (struct field *f, coord x, coord y) {
 			break;
 		}
 	}
-	return e->shipAddress;
+	if (e != 0) {
+		return e->shipAddress;
+	} else {
+		return 0;
+	}
+	
 }
 
 /*This function takes a pointer to a ship and a pointer to a field, and removes the shipElem struct for that shipAddress from
