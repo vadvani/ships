@@ -86,7 +86,7 @@ static struct ship* shipLookUp (struct field *f, coord x, coord y) {
 	h = h % f->shipSize;
 
 	for (e=f->shipTable[h]; e!=0; e=e->next) {
-		if ((e->shipAddress->topLeft.x) == x) && ((e->shipAddress->topLeft.y) == y) {
+		if (((e->shipAddress->topLeft.x) == x) && ((e->shipAddress->topLeft.y) == y)) {
 			break;
 		}
 	}
