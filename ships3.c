@@ -18,7 +18,7 @@ CITATION: USED EXAMPLE OF HASH TABLE DICTIONARY USING CHAINING TO AID WRITING TH
 
 struct field {
 	size_t shipCount; /*num ships in the field*/
-	unsigned int shipSize; /*size of coordinate table*/
+	int shipSize; /*size of coordinate table*/
 	struct shipElem **shipTable;
 };
 
@@ -28,7 +28,7 @@ struct shipElem {
 	struct shipElem *next; /*SHOULD THIS BE A DEQUE???*/
 };
 
-static struct field *fieldCreateInternal(unsigned int size) { /*IS AN INT LARGE ENOUGH FOR THIS???*/
+static struct field *fieldCreateInternal(int size) { /*IS AN INT LARGE ENOUGH FOR THIS???*/
 	struct field* field;
 	
 	field = malloc(sizeof(struct field));
@@ -95,7 +95,7 @@ static void growTable (struct field* f) {
 
 	for (i = 0; i < f->shipSize; i++) {
 		for (e = f->shipTable[i]; e != 0; e = e->next) {
-			internalShipInsert(f, e);
+			internalShipInsert(f2, e);
 		}
 	}
 
