@@ -85,8 +85,8 @@ static void internalShipInsert (struct field* f, struct shipElem* e) {
 
 }
 
-/*NEED TO IMPLEMENT THIS*/
-static void growTable (struct field* f) {
+
+static struct field* growTable (struct field* f) {
 	struct field* f2;
 	struct field* oldField;
 	int i;
@@ -99,12 +99,13 @@ static void growTable (struct field* f) {
 			internalShipInsert(f2, e);
 		}
 	}
-	printf("ShipSizes: %d", f->shipSize, f2->shipSize);
+	printf("ShipSizes: %d %d", f->shipSize, f2->shipSize);
 	oldField = f;
 	f = f2;
-	printf("ShipSizes: %d", f->shipSize, f2->shipSize);
+	printf("ShipSizes: %d %d", f->shipSize, f2->shipSize);
 	fieldDestroy(oldField);
 
+	return f;
 }
 
 
@@ -329,7 +330,7 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 				makeClear(f, ship);
 				
 				if (f->shipCount >= (f->shipSize * LOAD_FACTOR)) { /*If we have too many coordinates --> grow hash table*/
-					growTable(f); /*NOT IMPLEMENTED YET*/ 
+					f = growTable(f); /*NOT IMPLEMENTED YET*/ 
 				}	
 				h = hashShip(ship) % f->shipSize;
 				newElem = shipElemCreate(ship);
@@ -341,7 +342,7 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 				/*NEED TO IMPLEMENT THIS*/
 				makeClear(f, ship);
 				if (f->shipCount >= (f->shipSize * LOAD_FACTOR)) {
-					growTable(f); /*NOT IMPLEMENTED YET*/ 
+					f = growTable(f); /*NOT IMPLEMENTED YET*/ 
 				}	
 				h = hashShip(ship) % f->shipSize;
 				newElem = shipElemCreate(ship);
