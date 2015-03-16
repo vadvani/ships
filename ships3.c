@@ -338,7 +338,7 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 		
 		/*before place ship, need to make sure there's not already a ship there - STILL NEED TO WRITE THIS CODE*/
 
-		if ((s.direction == VERTICAL) && (((s.topLeft.x < COORD_MAX)) || ((s.topLeft.y + s.length - 1) < COORD_MAX))) { /*if dealing with vertical ship*/
+		if ((s.direction == VERTICAL) && ((s.topLeft.x < COORD_MAX) && (s.topLeft.y < COORD_MAX) && ((s.topLeft.y + s.length - 1) > s.topLeft.y))) { /*if dealing with vertical ship*/
 				ship = malloc(sizeof(struct ship)); /*mallocing memory to store ship struct*/
 				assert(ship);
 				*ship = s; /*IS THIS HOW YOU COPY ALL THE CONTENTS OF THE STRUCT OVER???*/
@@ -353,7 +353,7 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 				f->shipTable[h]= newElem;
 				(f->shipCount)++;
 		/*Now if ship is horizontal, do similar procedure*/
-		} else if ((s.direction == HORIZONTAL) && (((s.topLeft.x + s.length - 1) < COORD_MAX) || (s.topLeft.y < COORD_MAX))) {
+		} else if ((s.direction == HORIZONTAL) && ((s.topLeft.x < COORD_MAX) && ((s.topLeft.x + s.length - 1) > s.topLeft.x) && (s.topLeft.y < COORD_MAX))) {
 				ship = malloc(sizeof(struct ship)); /*mallocing memory to store ship struct*/
 				assert(ship);
 				*ship = s; /*IS THIS HOW YOU COPY ALL THE CONTENTS OF THE STRUCT OVER???*/
