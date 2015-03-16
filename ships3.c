@@ -85,6 +85,21 @@ static void internalShipInsert (struct field* f, struct shipElem* e) {
 
 }
 
+static void growFieldDestroy(struct field *f) {
+	struct shipElem* e;
+	struct shipElem* next;
+	for (int i=0; i<(f->shipSize); i++) {
+		e = f->shipTable[i];
+		while (e != 0) {
+			next = e->next;
+			free(e);
+			e = next;
+		}
+	}
+	free(f->shipTable);
+	free(f);
+}
+
 
 static void growTable (struct field* f) {
 	struct field* f2;
@@ -104,7 +119,7 @@ static void growTable (struct field* f) {
 	*f = *f2;
 	*f2 = swap;
 	
-	fieldDestroy(f2);
+	growFieldDestroy(f2);
 
 }
 
@@ -480,6 +495,7 @@ char fieldAttack(struct field *f, struct position p) {
 size_t fieldCountShips(const struct field *f) {
 	return f->shipCount;
 }
+
 
 void fieldDestroy(struct field *f){
 	struct shipElem* e;
