@@ -76,7 +76,7 @@ static void internalShipInsert (struct field* f, struct shipElem* e) {
 	struct shipElem* newElem;
 	
 	h = hashShip(e->shipAddress) % f->shipSize;
-	newElem = shipElemCreate(ship);
+	newElem = shipElemCreate(e->shipAddress);
 	newElem->next = f->shipTable[h];
 	f->shipTable[h]= newElem;
 	(f->shipCount)++;
