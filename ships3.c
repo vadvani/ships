@@ -333,15 +333,15 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 	struct ship* ship;
 	struct shipElem* newElem;
 	unsigned long h;
-	ship = malloc(sizeof(struct ship)); /*mallocing memory to store ship struct*/
-	assert(ship);
-	*ship = s; /*IS THIS HOW YOU COPY ALL THE CONTENTS OF THE STRUCT OVER???*/
 
 	if ((s.name != NO_SHIP_NAME) && (s.length <= MAX_SHIP_LENGTH) && (s.length > 0)) { /*is it <= or <???*/
 		
 		/*before place ship, need to make sure there's not already a ship there - STILL NEED TO WRITE THIS CODE*/
 
 		if ((s.direction == VERTICAL) && ((s.topLeft.x < COORD_MAX)) && ((s.topLeft.y + s.length - 1) < COORD_MAX)) { /*if dealing with vertical ship*/
+				ship = malloc(sizeof(struct ship)); /*mallocing memory to store ship struct*/
+				assert(ship);
+				*ship = s; /*IS THIS HOW YOU COPY ALL THE CONTENTS OF THE STRUCT OVER???*/
 				makeClear(f, ship);
 				
 				if (f->shipCount >= (f->shipSize * LOAD_FACTOR)) { /*If we have too many coordinates --> grow hash table*/
@@ -354,7 +354,9 @@ void fieldPlaceShip(struct field *f, struct ship s) { /*NEED TO ADD THAT IT GETS
 				(f->shipCount)++;
 		/*Now if ship is horizontal, do similar procedure*/
 		} else if ((s.direction == HORIZONTAL) && ((s.topLeft.x + s.length - 1) < COORD_MAX) && (s.topLeft.y < COORD_MAX)) {
-				/*NEED TO IMPLEMENT THIS*/
+				ship = malloc(sizeof(struct ship)); /*mallocing memory to store ship struct*/
+				assert(ship);
+				*ship = s; /*IS THIS HOW YOU COPY ALL THE CONTENTS OF THE STRUCT OVER???*/
 				makeClear(f, ship);
 				if (f->shipCount >= (f->shipSize * LOAD_FACTOR)) {
 					growTable(f); /*NOT IMPLEMENTED YET*/ 
