@@ -99,9 +99,10 @@ static void growTable (struct field* f) {
 			internalShipInsert(f2, e);
 		}
 	}
-
+	printf("ShipSizes: %d", f->shipSize, f2->shipSize);
 	oldField = f;
 	f = f2;
+	printf("ShipSizes: %d", f->shipSize, f2->shipSize);
 	fieldDestroy(oldField);
 
 }
