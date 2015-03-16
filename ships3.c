@@ -7,6 +7,7 @@
 #define LOAD_FACTOR (1)
 #define MULTIPLIER (37)
 #define INITIAL_SIZE (50)
+#define GROWTH_FACTOR (2)
 
 
 /*Veena Advani
@@ -72,6 +73,35 @@ static struct shipElem* shipElemCreate (struct ship* shipAddress) {
 
 /*NEED TO IMPLEMENT THIS*/
 static void growTable (struct field* f) {
+	struct field* f2;
+	struct field* oldField;
+	int i;
+	struct shipElem *e;
+
+	f2 = fieldCreateInternal(f->shipSize * GROWTH_FACTOR);
+
+	for (i = 0; i < f->shipSize; i++) {
+		for (e = f->shipTable[i]; e != 0; e = e->next) {
+			internalShipInsert(f, e);
+		}
+	}
+
+	oldField = f;
+	f = f2;
+	fieldDestroy(oldField);
+
+}
+
+static void internalShipInsert (struct field* f, struct shipElem* e) {
+	unsigned long h;
+	struct shipElem* newElem;
+	
+	h = hashShip(e->shipAddress) % f->shipSize;
+	newElem = shipElemCreate(ship);
+	newElem->next = f->shipTable[h];
+	f->shipTable[h]= newElem;
+	(f->shipCount)++;
+
 
 }
 
@@ -359,7 +389,7 @@ static char findAndDestroy (struct field* f, struct position p, coord i, coord j
 		return retVal;
 	}
 	/*if shipElem we want is first in list*/
-	if ((e->shipAddress->topLeft.x == i) && (e->shipAddress->topLeft.y == j)) { /*if ship located at correct point*/
+	else if ((e->shipAddress->topLeft.x == i) && (e->shipAddress->topLeft.y == j)) { /*if ship located at correct point*/
 		if ((pointOccupied(e->shipAddress, p.x, p.y)) == 1) { /*ship occupies attack position point --> need to free it*/
 			f->shipTable[h] = e->next;
 			retVal = e->shipAddress->name;
