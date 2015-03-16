@@ -253,6 +253,9 @@ static void makeClear (struct field* f, struct ship* s) {
 					/*printf("freed ship");*/
 				}
 			}
+			if (j== COORD_MAX) {
+				break;
+			}
 			j++;
 		}
 
@@ -276,7 +279,13 @@ static void makeClear (struct field* f, struct ship* s) {
 						/*printf("freed ship");*/
 					}
 				}
+				if (i == COORD_MAX) {
+					break;
+				}
 				i++;
+			}
+			if (j == COORD_MAX) {
+				break;
 			}
 		}
 
@@ -300,7 +309,13 @@ static void makeClear (struct field* f, struct ship* s) {
 						/*printf("freed ship");*/
 					}
 				}
+				if (j == COORD_MAX) {
+					break;
+				}
 				j++;
+			}
+			if (i == COORD_MAX) {
+				break;
 			}
 		}
 
@@ -320,6 +335,9 @@ static void makeClear (struct field* f, struct ship* s) {
 					freeShip(e, f);
 					/*printf("freed ship");*/
 				}
+			}
+			if (i == COORD_MAX) {
+				break;
 			}
 			i++;
 		}
@@ -474,7 +492,9 @@ char fieldAttack(struct field *f, struct position p) {
 	while ((j<= p.y) && (retVal == NO_SHIP_NAME)) {
 		/*see if ship exists with topleft at that point, then collision check, then free ship if needed and set return value to shipName*/
 		retVal = findAndDestroy(f, p, i, j);
-
+		if (j == COORD_MAX) {
+			break;
+		}
 		j++;
 	}
 
@@ -491,7 +511,9 @@ char fieldAttack(struct field *f, struct position p) {
 		while ((i <= p.x) && (retVal == NO_SHIP_NAME)) {
 		/*see if ship exists with topleft at that point, then collision check, then free ship if needed*/
 		retVal = findAndDestroy(f, p, i, j);
-		
+		if (i == COORD_MAX) {
+			break;
+		}
 		i++;
 		}
 	}  
