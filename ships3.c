@@ -226,6 +226,7 @@ static int collisionCheck (struct ship* s1, struct ship* s2) {
 			}
 		}
 	}
+	return 0;
 }
 
 
@@ -408,6 +409,7 @@ static int pointOccupied (struct ship* s, coord x, coord y) {
 			return 0;
 		}
 	}
+	return 0;
 }
 
 static char findAndDestroy (struct field* f, struct position p, coord i, coord j) {
@@ -470,10 +472,6 @@ char fieldAttack(struct field *f, struct position p) {
 	coord i;
 	coord j;
 	char retVal;
-	struct shipElem* e;
-	struct shipElem* prev;
-	struct shipElem* next;
-	unsigned long h;
 	retVal = NO_SHIP_NAME;
 	/*vertical check from point first*/
 	if ((p.x > COORD_MAX) || (p.y > COORD_MAX)) { /*if coordinate to attack is out of range*/
