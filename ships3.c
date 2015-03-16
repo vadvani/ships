@@ -71,6 +71,19 @@ static struct shipElem* shipElemCreate (struct ship* shipAddress) {
 	return newElem;
 }
 
+static void internalShipInsert (struct field* f, struct shipElem* e) {
+	unsigned long h;
+	struct shipElem* newElem;
+	
+	h = hashShip(e->shipAddress) % f->shipSize;
+	newElem = shipElemCreate(ship);
+	newElem->next = f->shipTable[h];
+	f->shipTable[h]= newElem;
+	(f->shipCount)++;
+
+
+}
+
 /*NEED TO IMPLEMENT THIS*/
 static void growTable (struct field* f) {
 	struct field* f2;
@@ -92,18 +105,6 @@ static void growTable (struct field* f) {
 
 }
 
-static void internalShipInsert (struct field* f, struct shipElem* e) {
-	unsigned long h;
-	struct shipElem* newElem;
-	
-	h = hashShip(e->shipAddress) % f->shipSize;
-	newElem = shipElemCreate(ship);
-	newElem->next = f->shipTable[h];
-	f->shipTable[h]= newElem;
-	(f->shipCount)++;
-
-
-}
 
 /*Takes in a pointer to a field and two coordinates and returns a pointer to a ship if that ship has it's topleft coordinate
 at the input coordinate pair*/
