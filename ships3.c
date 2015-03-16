@@ -43,6 +43,7 @@ static struct field *fieldCreateInternal(int size) { /*IS AN INT LARGE ENOUGH FO
 	for (int j = 0; j < field->shipSize; j++) {
 		field->shipTable[j] = 0;
 	}
+	printf("%d", f->shipSize);
 	return field;
 }
 
