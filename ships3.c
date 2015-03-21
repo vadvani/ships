@@ -94,7 +94,7 @@ static struct shipElem* shipElemCreate (const struct ship* shipAddress) {
 /*this function takes in a pointer to a field and a pointer to a shipElem and then inserts a new, identical ship element 
 into the hash table of that field, used for transfering shipElem's over when growing the hash table*/
 
-static void internalShipInsert (const struct field* f, const struct shipElem* e) {
+static void internalShipInsert (struct field* f, const struct shipElem* e) {
 	unsigned long h;
 	struct shipElem* newElem;
 	
